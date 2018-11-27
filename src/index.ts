@@ -224,3 +224,10 @@ class EntityManager {
   private entityComponents: Map<EntityId, Map<Constructor<Component>, Component>> = new Map()
   private componentEntities: Map<Constructor<Component>, Set<EntityId>> = new Map()
 }
+
+
+export abstract class System {
+  public abstract configure(world: World): void
+  public abstract unconfigure(world: World): void
+  public abstract tick(world: World, delta: number): void
+}
