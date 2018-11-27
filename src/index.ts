@@ -201,6 +201,7 @@ class EntityManager {
     let entityComponents: Map<Constructor<Component>, Component>
     if (!this.entityComponents.has(entityId)) {
       entityComponents = new Map()
+      this.entityComponents.set(entityId, entityComponents)
     } else {
       entityComponents = this.entityComponents.get(entityId)!
     }
@@ -212,6 +213,7 @@ class EntityManager {
     let componentEntities = this.componentEntities.get(ctor)
     if (!this.componentEntities.has(ctor)) {
       componentEntities = new Set()
+      this.componentEntities.set(ctor, componentEntities)
     } else {
       componentEntities = this.componentEntities.get(ctor)!
     }
