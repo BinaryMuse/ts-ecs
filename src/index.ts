@@ -165,7 +165,7 @@ class EntityManager {
     const components = this.getComponentsForEntity(entityId)
     const comp = components.get(ctor)
     if (comp) {
-      return Maybe.Some(comp)
+      return Maybe.Some(<T>comp)
     } else {
       return Maybe.None()
     }
