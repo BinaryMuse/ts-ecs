@@ -59,6 +59,11 @@ export class Entity {
     return this.em.getComponent<T>(this.entityId, ctor)
   }
 
+  // Unsafe version of `getComponent` (throws if the component is not found).
+  public getComponentUnsafe<T extends Component>(ctor: Constructor<T>): T {
+    return this.getComponent(ctor).some()
+  }
+
   // Determine if this entity has a component for all of the given
   // types. `ctors` should be an array of constructor functions
   // for classes that implement `Component`.
@@ -98,6 +103,11 @@ export class World {
   // or `Maybe.None()` otherwise.
   public getEntity(entityId: EntityId): Maybe<Entity> {
     return this.em.getEntity(entityId)
+  }
+
+  // Unsafe version of `getEntity` (throws if the entity is not found).
+  public getEntityUnsafe(entityId: EntityId): Entity {
+    return this.getEntity(entityId).some()
   }
 
   // Remove an entity from the world. All handles to the
