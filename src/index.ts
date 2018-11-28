@@ -2,6 +2,11 @@ import uuid from "./uuid"
 import { Maybe } from "monet"
 
 
+function now() {
+  return new Date().getTime()
+}
+
+
 interface Constructor<T> {
   new(...args: any[]): T
 }
@@ -13,6 +18,28 @@ export type EntityId = string
 
 // All components must implement `Component`.
 export interface Component {}
+
+
+// A `TickScheduler` is used by a `World` to schedule each call
+// to the world's internal `tick` method. `scheduleTick` should
+// schedule the passed function to be called in the future, and
+// if it returns a non-null value, that value should be a handle
+// that can be passed to `cancelTick` to cancel the scheduled tick.
+export interface TickScheduler {
+  scheduleTick: (tick: () => void) => any
+  cancelTick: (handle: any) => any
+}
+
+
+class DefaultScheduler implements TickScheduler {
+  scheduleTick(tick: () => void): number {
+    return requestAnimationFrame(tick)
+  }
+
+  cancelTick(handle: number): void {
+    return cancelAnimationFrame(handle)
+  }
+}
 
 
 // An entity is just a global identifier; an `Entity` object
@@ -93,6 +120,10 @@ export class Entity {
 // A `World` is the root of the ECS architecture. It manages
 // an internal `EntityManager`, which it uses to manage entities.
 export class World {
+  constructor() {
+    this.tick = this.tick.bind(this)
+  }
+
   // Create a new entity and get a handle to it.
   public createEntity(): Entity {
     return this.em.createEntity()
@@ -125,7 +156,72 @@ export class World {
     return this.em.getEntitiesWithComponents(...ctors)
   }
 
+  // Add a system to the world. The system's `configure` method
+  // will be called with the `World` as the only argument.
+  // The system's `tick` function will be called on every world
+  // tick once the world is started.
+  public addSystem(system: System): void {
+    system.configure(this)
+    this.systems.add(system)
+  }
+
+  // Remove a system from the world. The system's `unconfigure` method
+  // will be called with the `World` as the only argument.
+  public removeSystem(system: System): void {
+    system.unconfigure(this)
+    this.systems.delete(system)
+  }
+
+  // Start the world, which calls the `tick` method of every
+  // system each time it ticks. `tickScheduler` should be an
+  // instance of `TickScheduler` to use to schedule (and cancel)
+  // calls to the world's internal `tick` method. If none is provided,
+  // the world uses a default scheduler that uses `requestAnimationFrame`
+  // and `cancelAnimationFrame` for scheduling ticks.
+  public start(tickScheduler: TickScheduler = new DefaultScheduler()) {
+    if (this.running) {
+      return
+    }
+
+    this.running = true
+    this.lastTick = now()
+    this.scheduler = tickScheduler
+    this.nextTickHandle = this.scheduler.scheduleTick(this.tick)
+  }
+
+  // Stops the world, preventing the world's systems from having
+  // their `tick` methods called.
+  public stop() {
+    if (this.running) {
+      this.running = false
+
+      if (this.nextTickHandle) {
+        this.scheduler!.cancelTick(this.nextTickHandle)
+        this.nextTickHandle = null
+      }
+    }
+  }
+
+  private tick() {
+    if (this.running) {
+      const thisTick = now()
+      const delta = thisTick - this.lastTick
+      this.lastTick = thisTick
+
+      for (const system of this.systems.values()) {
+        system.tick(this, delta)
+      }
+
+      this.nextTickHandle = this.scheduler!.scheduleTick(this.tick)
+    }
+  }
+
   private em: EntityManager = new EntityManager()
+  private systems: Set<System> = new Set()
+  private running: boolean = false
+  private scheduler: TickScheduler | null = null
+  private lastTick: number = 0
+  private nextTickHandle: any = null
 }
 
 
