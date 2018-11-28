@@ -278,7 +278,7 @@ class EntityManager {
 
   public getEntitiesWithComponents(...ctors: Array<Constructor<Component>>): ReadonlyArray<EntityId> {
     if (ctors.length === 0) {
-      throw new Error("No Component constructor passed to World#withComponent")
+      throw new Error("No Component constructors passed to World#withComponent")
     }
 
     let result = []
