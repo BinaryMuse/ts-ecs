@@ -253,8 +253,7 @@ class EntityManager {
     // Remove all component registrations for this entity
     // so that `entityComponents` is empty for the given entity
     // and no `componentEntities` keys reference this entity.
-    const registeredComponents = [...this.getComponentsForEntity(entityId).keys()]
-    registeredComponents.forEach(ctor => this.removeComponent(entityId, ctor))
+    this.removeComponents(entityId, this.getComponentsForEntity(entityId).keys())
     // Now we can remove the remaining references to this entity.
     this.entityComponents.delete(entityId)
     this.entities.delete(entityId)
@@ -293,8 +292,10 @@ class EntityManager {
     return result
   }
 
-  public removeComponents(entityId: EntityId, ctors: Array<Constructor<Component>>) {
-    ctors.forEach(ctor => this.removeComponent(entityId, ctor))
+  public removeComponents(entityId: EntityId, ctors: Array<Constructor<Component>> | IterableIterator<Constructor<Component>>) {
+    for (const ctor of ctors) {
+      this.removeComponent(entityId, ctor)
+    }
   }
 
   public removeComponent<T extends Component>(entityId: EntityId, ctor: Constructor<T>): void {
