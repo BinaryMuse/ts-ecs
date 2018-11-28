@@ -142,9 +142,8 @@ export class World {
   }
 
   // Remove an entity from the world. All handles to the
-  // entity are invalid once this is called.
-  // Returns `true` if the entity was found and deleted, or `false` otherwise.
-  // This entity handle is no longer valid after calling this method.
+  // entity are invalid once this is called. Returns `true`
+  // if the entity was found and deleted, or `false` otherwise.
   public deleteEntity(entityId: EntityId): boolean {
     return this.em.deleteEntity(entityId)
   }
