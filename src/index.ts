@@ -1,4 +1,4 @@
-import * as uuid from "uuid/v4"
+import uuid from "./uuid"
 import { Maybe } from "monet"
 
 
@@ -136,7 +136,7 @@ export class World {
 // to an internal `EntityManager`.
 class EntityManager {
   public createEntity(): Entity {
-    const id = uuid()
+    const id = uuid.generate()
     this.entities.add(id)
     return new Entity(this, id)
   }
