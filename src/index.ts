@@ -167,8 +167,8 @@ export class World {
   // Remove a system from the world. The system's `unconfigure` method
   // will be called with the `World` as the only argument.
   public removeSystem(system: System): void {
-    system.unconfigure(this)
     this.systems.delete(system)
+    system.unconfigure(this)
   }
 
   // Start the world, which calls the `tick` method of every
