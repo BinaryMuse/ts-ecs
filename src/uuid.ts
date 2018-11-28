@@ -5,7 +5,6 @@
  * @link http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
  **/
 var UUID = (function() {
-  var self = { generate: null };
   var lut: any = []; for (var i=0; i<256; i++) { lut[i] = (i<16?'0':'')+(i).toString(16); }
   return {
     generate: function() {
