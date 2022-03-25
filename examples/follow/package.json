@@ -11,6 +11,6 @@
   "license": "MIT",
   "private": true,
   "devDependencies": {
-    "electron": "^3.0.10"
+    "electron": "^13.6.6"
   }
 }
